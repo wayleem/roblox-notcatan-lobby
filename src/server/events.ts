@@ -7,10 +7,9 @@ import { serialize_lobby } from "shared/utils";
 const createLobbyEvent = ReplicatedStorage.WaitForChild("CreateLobbyEvent") as RemoteEvent;
 
 createLobbyEvent.OnServerEvent.Connect((p) => {
-	const lobbyId = serialize_lobby(p.UserId);
 	const lobby: Lobby = {
 		owner: p,
 		players: [p],
 	};
-	store.dispatch(create<Lobby>(lobbyId, lobby, "lobbies"));
+	store.dispatch(create<Lobby>(tostring(p.UserId), lobby, "lobbies"));
 });
