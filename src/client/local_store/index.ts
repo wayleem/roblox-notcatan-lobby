@@ -1,8 +1,10 @@
 import { Store, combineReducers } from "@rbxts/rodux";
 import { lobbies_reducer } from "./lobbies_reducer";
+import { gui_reducer } from "./gui_reducer";
 
 const root_reducer = combineReducers({
 	lobbies: lobbies_reducer,
+	gui: gui_reducer,
 });
 
 export const local_store = new Store(root_reducer);
