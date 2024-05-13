@@ -6,3 +6,8 @@ export interface Lobby {
 	owner: Player;
 	players: Player[];
 }
+
+export interface Gui {
+	screen: Roact.Element;
+	tree: Roact.Tree;
+}
