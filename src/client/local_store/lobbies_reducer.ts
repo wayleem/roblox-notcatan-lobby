@@ -1,5 +1,9 @@
+import { Players } from "@rbxts/services";
 import { MyActions } from "shared/actions";
 import { ArrayT, Lobby } from "shared/types";
+
+const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
+const screenGui = playerGui.WaitForChild("ScreenGui") as ScreenGui;
 
 export interface LobbiesState {
 	lobbies: ArrayT<Lobby>;
