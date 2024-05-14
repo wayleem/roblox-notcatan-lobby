@@ -2,7 +2,6 @@ import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
 import MenuGui from "client/ui/MenuGui";
 import { MyActions } from "shared/actions";
-import { Gui } from "shared/types";
 
 const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
 const screenGui = playerGui.WaitForChild("ScreenGui") as ScreenGui;

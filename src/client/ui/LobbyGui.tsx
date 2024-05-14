@@ -9,6 +9,7 @@ const screenGui = playerGui.WaitForChild("ScreenGui") as ScreenGui;
 
 interface LobbyProps {
 	lobby: Lobby;
+	onNavigate: () => void;
 }
 
 function LobbyGui(props: LobbyProps) {

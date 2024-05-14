@@ -54,15 +54,15 @@ function MenuGui() {
 				VerticalAlignment={Enum.VerticalAlignment.Center}
 				SortOrder={Enum.SortOrder.LayoutOrder}
 			/>
-			<MenuButton text="Create Lobby" navigate={LobbyGui(new Lobby())} order={1} />
+			<MenuButton
+				text="Create Lobby"
+				navigate={LobbyGui({ owner: Players.LocalPlayer, players: [] })}
+				order={1}
+			/>
 			<MenuButton text="Join Server" navigate={ServerListGui()} order={2} />
 			<MenuButton text="Find Friend" navigate={FriendListGui()} order={3} />
 		</frame>
 	);
-}
-
-function createNewLobby(): Lobby {
-	return;
 }
 
 export default MenuGui;
