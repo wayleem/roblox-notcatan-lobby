@@ -1,13 +1,13 @@
 import Roact from "@rbxts/roact";
-import { create, merge, update } from "shared/actions";
+import { merge } from "shared/actions";
 import { local_store } from "client/local_store";
-import { gui } from "shared/types";
-import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
-import { GuiState } from "client/local_store/gui_reducer";
+import { withHooks } from "@rbxts/roact-hooked";
+import { GuiState } from "client/local_store/gui-reducer";
+import { RouterState } from "client/local_store/route-reducer";
 
 interface ButtonProps {
 	text: string;
-	navigate: keyof GuiState;
+	to: keyof GuiState;
 	order: number;
 	event?: RemoteEvent;
 }
@@ -26,13 +26,9 @@ function MenuButton(props: ButtonProps) {
 			Event={{
 				MouseButton1Click: () => {
 					if (props.event) props.event.FireServer();
-					// Create the new state based on the navigate prop
-					const newState: Partial<GuiState> = { [props.navigate]: true };
+					local_store.dispatch(merge<RouterState>("", { route: props.to }, "router"));
 
-					// Dispatch merge action with the new state
-					local_store.dispatch(merge<GuiState>("", newState, "gui"));
-
-					print("going to: " + local_store.getState().gui);
+					print("going to: " + local_store.getState().router.route);
 				},
 			}}
 		/>
@@ -55,9 +51,9 @@ function MenuGui() {
 				VerticalAlignment={Enum.VerticalAlignment.Center}
 				SortOrder={Enum.SortOrder.LayoutOrder}
 			/>
-			<MenuButton text="Create Lobby" navigate="lobby" order={1} />
-			<MenuButton text="Join Server" navigate="server" order={2} />
-			<MenuButton text="Find Friend" navigate="friends" order={3} />
+			<MenuButton text="Create Lobby" to="lobby" order={1} />
+			<MenuButton text="Join Server" to="server" order={2} />
+			<MenuButton text="Find Friend" to="friends" order={3} />
 		</frame>
 	);
 }

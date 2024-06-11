@@ -4,6 +4,10 @@ import { makeHello } from "shared/module";
 import { local_store } from "./local_store";
 import Roact from "@rbxts/roact";
 import Router from "./Router";
+import MenuGui from "./ui/MenuGui";
+import LobbyGui from "./ui/LobbyGui";
+import FriendListGui from "./ui/FriendListGui";
+import ServerListGui from "./ui/ServerListGui";
 
 const serverToClientEvent = ReplicatedStorage.WaitForChild("UpdateClientEvent") as RemoteEvent;
 
@@ -16,7 +20,19 @@ serverToClientEvent.OnClientEvent.Connect((action: MyActions<any>) => {
 
 Players.LocalPlayer.CharacterAdded.Connect(() => {
 	print("gui load");
-	Roact.mount(<Router />, playerGui, "Router");
+	Roact.mount(
+		<screengui>
+			<Router />
+			<frame>
+				<MenuGui />
+				<LobbyGui />
+				<FriendListGui />
+				<ServerListGui />
+			</frame>
+		</screengui>,
+		playerGui,
+		"Router",
+	);
 });
 
 print(makeHello("main.client.ts"));

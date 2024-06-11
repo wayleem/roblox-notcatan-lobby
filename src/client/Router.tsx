@@ -1,40 +1,35 @@
 import Roact from "@rbxts/roact";
-import { useEffect } from "@rbxts/roact-hooked";
+import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "./local_store";
-import { RouterState } from "./local_store/route-reducer";
-import { merge } from "shared/actions";
-
-// Define your route components
-const Home = () => <textlabel Text="Home Page" Size={new UDim2(1, 0, 1, 0)} />;
-const About = () => <textlabel Text="About Page" Size={new UDim2(1, 0, 1, 0)} />;
-const Contact = () => <textlabel Text="Contact Page" Size={new UDim2(1, 0, 1, 0)} />;
+import MenuGui from "./ui/MenuGui";
+import LobbyGui from "./ui/LobbyGui";
+import ServerListGui from "./ui/ServerListGui";
+import FriendListGui from "./ui/FriendListGui";
 
 // Map route to component
 const routes: Record<string, Roact.FunctionComponent> = {
-	home: Home,
-	about: About,
-	contact: Contact,
+	menu: MenuGui,
+	friends: FriendListGui,
+	server: ServerListGui,
+	lobby: LobbyGui,
 };
 
-const Router: Roact.FunctionComponent = () => {
-	const [state, setState] = Roact.useState(store.getState());
+const RouterComponent: Roact.FunctionComponent = () => {
+	const [state, setState] = useState(local_store.getState());
 
 	useEffect(() => {
-		const unsubscribe = store.changed.connect(() => {
-			setState(store.getState());
+		const unsubscribe = local_store.changed.connect(() => {
+			setState(local_store.getState());
 		});
 
 		return () => unsubscribe.disconnect();
 	}, []);
 
-	const RouteComponent = routes[state.route] || Home;
+	const RouteComponent = routes[state.router.route] || MenuGui;
 
 	return <RouteComponent />;
 };
 
-// Utility functions to change routes
-const navigate = (route: string) => {
-	store.dispatch(merge<RouterState>("", { route }, "router"));
-};
+const Router = withHooks(RouterComponent);
 
-export { Router, navigate };
+export default Router;

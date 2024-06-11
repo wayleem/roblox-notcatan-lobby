@@ -5,16 +5,13 @@ import { Lobby, gui } from "shared/types";
 import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "client/local_store";
 
-const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
-const screenGui = playerGui.WaitForChild("ScreenGui") as ScreenGui;
-
 function LobbyGui() {
-	const [lobby, setLobby] = useState(local_store.getState().local_lobby);
+	const [lobby, setLobby] = useState(local_store.getState().localLobby);
 	const isOwner = lobby.owner === tostring(Players.LocalPlayer.UserId);
 
 	useEffect(() => {
 		const unsubscribe = local_store.changed.connect(() => {
-			setLobby(local_store.getState().local_lobby);
+			setLobby(local_store.getState().localLobby);
 		});
 
 		return () => unsubscribe.disconnect();
