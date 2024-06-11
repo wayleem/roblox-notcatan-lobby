@@ -1,6 +1,9 @@
 import Roact from "@rbxts/roact";
 
-function ServerListGui() {
+interface Props {
+	isVisible: boolean; // This prop will be passed from where you mount this component
+}
+function ServerListGui(props: Props) {
 	return <frame />;
 }
 
