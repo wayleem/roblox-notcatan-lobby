@@ -1,11 +1,9 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { MyActions, create } from "shared/actions";
+import { MyActions } from "shared/actions";
 import { makeHello } from "shared/module";
 import { local_store } from "./local_store";
-import MenuGui from "./ui/MenuGui";
 import Roact from "@rbxts/roact";
-import FriendListGui from "./ui/FriendListGui";
-import ServerListGui from "./ui/ServerListGui";
+import Router from "./Router";
 
 const serverToClientEvent = ReplicatedStorage.WaitForChild("UpdateClientEvent") as RemoteEvent;
 
@@ -18,15 +16,7 @@ serverToClientEvent.OnClientEvent.Connect((action: MyActions<any>) => {
 
 Players.LocalPlayer.CharacterAdded.Connect(() => {
 	print("gui load");
-	const guiState = local_store.getState().gui;
-	Roact.mount(
-		<screengui>
-			<MenuGui />
-			<FriendListGui isVisible={guiState === "friends"} />
-			<ServerListGui isVisible={guiState === "servers"} />
-		</screengui>,
-		playerGui,
-	);
+	Roact.mount(<Router />, playerGui, "Router");
 });
 
 print(makeHello("main.client.ts"));

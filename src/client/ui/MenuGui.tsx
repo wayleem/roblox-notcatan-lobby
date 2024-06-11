@@ -40,23 +40,6 @@ function MenuButton(props: ButtonProps) {
 }
 
 function MenuGui() {
-	const [guiState, setGuiState] = useState(local_store.getState().gui.menu);
-
-	useEffect(() => {
-		// Subscribe to store updates
-		const unsubscribe = local_store.subscribe(() => {
-			const newGuiState = local_store.getState().gui.menu;
-			setGuiState(newGuiState);
-		});
-
-		// Cleanup subscription on unmount
-		return () => unsubscribe();
-	}, []);
-
-	useEffect(() => {
-		// This function runs on mount and whenever guiState changes
-		print("Visibility changed:", guiState);
-	}, [guiState]);
 	return (
 		<frame
 			Size={new UDim2(1 / 3, 0, 1, 0)} // 1/3 of the width, full height
@@ -64,7 +47,6 @@ function MenuGui() {
 			BackgroundColor3={Color3.fromRGB(45, 45, 45)} // Dark background
 			BackgroundTransparency={0.5} // Semi-transparent
 			BorderSizePixel={0}
-			Visible={guiState} // Toggle visibility based on local_gui state
 		>
 			<uilistlayout
 				Padding={new UDim(0, 20)}

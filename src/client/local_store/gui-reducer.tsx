@@ -19,7 +19,7 @@ export function gui_reducer(state: GuiState = initState, action: MyActions<GuiSt
 			case "UPDATE_KEY":
 				const { key, value } = action;
 				// Ensure that the value is of the correct type (boolean in this case)
-				if (typeof value === "boolean") {
+				if (typeOf(value) === "boolean") {
 					return {
 						...state,
 						[key]: value, // Update the state key with the new value

@@ -2,19 +2,24 @@ import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
 import { create } from "shared/actions";
 import { Lobby, gui } from "shared/types";
-import MenuGui from "./MenuGui";
+import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "client/local_store";
 
 const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
 const screenGui = playerGui.WaitForChild("ScreenGui") as ScreenGui;
 
-interface Props {
-	isVisible: boolean; // This prop will be passed from where you mount this component
-}
-
-function LobbyGui(props: Props) {
-	let lobby: Lobby = local_store.getState().local_lobby;
+function LobbyGui() {
+	const [lobby, setLobby] = useState(local_store.getState().local_lobby);
 	const isOwner = lobby.owner === tostring(Players.LocalPlayer.UserId);
+
+	useEffect(() => {
+		const unsubscribe = local_store.changed.connect(() => {
+			setLobby(local_store.getState().local_lobby);
+		});
+
+		return () => unsubscribe.disconnect();
+	}, []);
+
 	const players = lobby.players.map((player, index) => (
 		<textlabel
 			Key={tostring(player.UserId)}
@@ -71,7 +76,9 @@ function LobbyGui(props: Props) {
 					TextSize={18}
 					Font={Enum.Font.SourceSans}
 					Event={{
-						MouseButton1Click: () => create<gui>("", "menu", "gui"),
+						MouseButton1Click: () => {
+							local_store.dispatch(create<gui>("", "menu", "gui"));
+						},
 					}}
 				/>
 			</frame>
@@ -79,4 +86,4 @@ function LobbyGui(props: Props) {
 	);
 }
 
-export default LobbyGui;
+export default withHooks(LobbyGui);
