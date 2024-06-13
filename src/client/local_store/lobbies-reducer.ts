@@ -6,7 +6,7 @@ export interface LobbiesState {
 }
 
 export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {
-	if (action.target === "lobbies")
+	if (action.target === "lobbies") {
 		switch (action.type) {
 			case "CREATE":
 				return {
@@ -37,6 +37,11 @@ export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lob
 					};
 				}
 				return state;
+			case "DEL":
+				const newState = { ...state };
+				delete newState[action.id];
+				return newState;
 		}
+	}
 	return state;
 }

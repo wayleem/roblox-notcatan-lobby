@@ -4,6 +4,9 @@ import { local_store } from "client/local_store";
 import { withHooks } from "@rbxts/roact-hooked";
 import { GuiState } from "client/local_store/gui-reducer";
 import { RouterState } from "client/local_store/route-reducer";
+import { Players, ReplicatedStorage } from "@rbxts/services";
+import Object from "@rbxts/object-utils";
+import { Lobby } from "shared/types";
 
 interface ButtonProps {
 	text: string;
@@ -11,6 +14,8 @@ interface ButtonProps {
 	order: number;
 	event?: RemoteEvent;
 }
+
+const createLobbyEvent = ReplicatedStorage.WaitForChild("CreateLobbyEvent") as RemoteEvent;
 
 function MenuButton(props: ButtonProps) {
 	return (
@@ -25,10 +30,17 @@ function MenuButton(props: ButtonProps) {
 			BorderSizePixel={0}
 			Event={{
 				MouseButton1Click: () => {
-					if (props.event) props.event.FireServer();
+					if (props.event) {
+						props.event.FireServer();
+						print("fired: " + props.event.Name);
+					}
+					const newLobby: Lobby = {
+						owner: tostring(Players.LocalPlayer.UserId),
+						players: [Players.LocalPlayer],
+					};
+					local_store.dispatch(merge("current", newLobby, "localLobby"));
 					local_store.dispatch(merge<RouterState>("", { route: props.to }, "router"));
-
-					print("going to: " + local_store.getState().router.route);
+					print("lobbies: " + Object.entries(local_store.getState().lobbies));
 				},
 			}}
 		/>
@@ -38,6 +50,7 @@ function MenuButton(props: ButtonProps) {
 function MenuGui() {
 	return (
 		<frame
+			Key="Menu"
 			Size={new UDim2(1 / 3, 0, 1, 0)} // 1/3 of the width, full height
 			Position={new UDim2(0, 0, 0, 0)} // Positioned at the top-left corner
 			BackgroundColor3={Color3.fromRGB(45, 45, 45)} // Dark background
@@ -51,7 +64,7 @@ function MenuGui() {
 				VerticalAlignment={Enum.VerticalAlignment.Center}
 				SortOrder={Enum.SortOrder.LayoutOrder}
 			/>
-			<MenuButton text="Create Lobby" to="lobby" order={1} />
+			<MenuButton text="Create Lobby" to="lobby" order={1} event={createLobbyEvent} />
 			<MenuButton text="Join Server" to="server" order={2} />
 			<MenuButton text="Find Friend" to="friends" order={3} />
 		</frame>

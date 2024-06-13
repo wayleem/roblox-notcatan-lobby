@@ -1,21 +1,41 @@
 import Roact from "@rbxts/roact";
-import { Players } from "@rbxts/services";
-import { create } from "shared/actions";
-import { Lobby, gui } from "shared/types";
+import { Players, ReplicatedStorage } from "@rbxts/services";
 import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "client/local_store";
+import { RouterState } from "client/local_store/route-reducer";
+import { Lobby } from "shared/types";
+import { merge } from "shared/actions";
+
+const leaveLobbyEvent = ReplicatedStorage.WaitForChild("LeaveLobbyEvent") as RemoteEvent;
 
 function LobbyGui() {
-	const [lobby, setLobby] = useState(local_store.getState().localLobby);
-	const isOwner = lobby.owner === tostring(Players.LocalPlayer.UserId);
+	const [lobby, setLobby] = useState<Lobby | undefined>(local_store.getState().localLobby);
+	const localPlayerId = tostring(Players.LocalPlayer.UserId);
 
 	useEffect(() => {
 		const unsubscribe = local_store.changed.connect(() => {
-			setLobby(local_store.getState().localLobby);
+			const state = local_store.getState();
+			const currentLobby = state.localLobby;
+			print("Updated lobby state:", currentLobby); // Debug statement
+			setLobby(currentLobby);
 		});
 
 		return () => unsubscribe.disconnect();
 	}, []);
+
+	useEffect(() => {
+		if (lobby && lobby.owner) {
+			print("Lobby owner:", lobby.owner); // Debug statement
+			print("Local player ID:", localPlayerId); // Debug statement
+		}
+	}, [lobby]);
+
+	if (!lobby || !lobby.owner) {
+		print("Lobby state is undefined or owner is not set."); // Debug statement
+		return <textlabel Text="Loading..." Size={new UDim2(1, 0, 1, 0)} />;
+	}
+
+	const isOwner = lobby.owner === localPlayerId;
 
 	const players = lobby.players.map((player, index) => (
 		<textlabel
@@ -33,6 +53,7 @@ function LobbyGui() {
 
 	return (
 		<frame
+			Key="Lobby"
 			Size={new UDim2(0.3, 0, 0.5, 0)}
 			Position={new UDim2(0.35, 0, 0.25, 0)}
 			BackgroundColor3={Color3.fromRGB(25, 25, 25)}
@@ -74,7 +95,9 @@ function LobbyGui() {
 					Font={Enum.Font.SourceSans}
 					Event={{
 						MouseButton1Click: () => {
-							local_store.dispatch(create<gui>("", "menu", "gui"));
+							leaveLobbyEvent.FireServer();
+							print("player count after leaving: " + lobby.players.size());
+							local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
 						},
 					}}
 				/>

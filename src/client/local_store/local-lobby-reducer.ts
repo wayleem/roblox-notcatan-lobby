@@ -1,17 +1,22 @@
 import { MyActions } from "shared/actions";
 import { Lobby } from "shared/types";
 
-export function local_lobby_reducer(state: Lobby = { owner: "", players: [] }, action: MyActions<Lobby>): Lobby {
-	if (action.target === "lobbyui")
+const initialState: Lobby | undefined = undefined;
+
+export function local_lobby_reducer(
+	state: Lobby | undefined = initialState,
+	action: MyActions<Lobby>,
+): Lobby | undefined {
+	if (action.target === "localLobby") {
 		switch (action.type) {
-			case "CREATE":
-				return state;
-			case "UPDATE_KEY":
+			case "MERGE":
 				return {
 					...state,
-					[action.key]: action.value,
+					...action.data,
+					owner: action.data.owner ?? state?.owner ?? "",
+					players: action.data.players ?? state?.players ?? [],
 				};
 		}
-
+	}
 	return state;
 }

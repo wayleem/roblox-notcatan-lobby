@@ -12,6 +12,7 @@ export function router_reducer(state: RouterState = initialRouter, action: MyAct
 	if (action.target === "router")
 		switch (action.type) {
 			case "MERGE":
+				print("going to: " + action.data.route);
 				return {
 					...state,
 					...action.data,

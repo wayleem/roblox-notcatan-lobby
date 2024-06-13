@@ -1,3 +1,4 @@
+import Object from "@rbxts/object-utils";
 import { Players, ReplicatedStorage } from "@rbxts/services";
 import { MyActions } from "shared/actions";
 import { ArrayT, Lobby } from "shared/types";
@@ -44,6 +45,11 @@ export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lob
 					};
 				}
 				return state;
+			case "DEL":
+				remoteEvent.FireAllClients(action);
+				const newState = { ...state };
+				delete newState[action.id];
+				return newState;
 			case "PING":
 				const localPlayer = Players.GetPlayerByUserId(deserialize_userid(action.id));
 				if (localPlayer) remoteEvent.FireClient(localPlayer, action);

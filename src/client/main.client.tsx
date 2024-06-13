@@ -1,34 +1,34 @@
 import { Players, ReplicatedStorage } from "@rbxts/services";
-import { MyActions } from "shared/actions";
+import { MyActions, merge } from "shared/actions";
 import { makeHello } from "shared/module";
 import { local_store } from "./local_store";
 import Roact from "@rbxts/roact";
 import Router from "./Router";
-import MenuGui from "./ui/MenuGui";
-import LobbyGui from "./ui/LobbyGui";
-import FriendListGui from "./ui/FriendListGui";
-import ServerListGui from "./ui/ServerListGui";
 
 const serverToClientEvent = ReplicatedStorage.WaitForChild("UpdateClientEvent") as RemoteEvent;
 
 const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
 
 serverToClientEvent.OnClientEvent.Connect((action: MyActions<any>) => {
-	//print("Received action from server: ", action);
+	print("Received action from server: ", action);
 	local_store.dispatch(action);
-});
 
+	if (action.target === "lobbies" && action.type === "DEL") {
+		const currentLobby = local_store.getState().localLobby;
+		if (currentLobby && currentLobby.owner === action.id) {
+			local_store.dispatch(merge("current", {}, "localLobby"));
+		}
+	} else if (action.target === "lobbies" && (action.type === "MERGE" || action.type === "CREATE")) {
+		const currentLobby = local_store.getState().localLobby;
+		if (currentLobby && currentLobby.owner === action.id) {
+			local_store.dispatch(merge("current", action.data, "localLobby"));
+		}
+	}
+});
 Players.LocalPlayer.CharacterAdded.Connect(() => {
-	print("gui load");
 	Roact.mount(
-		<screengui>
+		<screengui IgnoreGuiInset={true}>
 			<Router />
-			<frame>
-				<MenuGui />
-				<LobbyGui />
-				<FriendListGui />
-				<ServerListGui />
-			</frame>
 		</screengui>,
 		playerGui,
 		"Router",
