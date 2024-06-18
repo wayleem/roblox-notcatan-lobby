@@ -1,4 +1,4 @@
-import { ReplicatedStorage } from "@rbxts/services";
+import { ReplicatedStorage, TeleportService } from "@rbxts/services";
 import { store } from "./store";
 import { Lobby } from "shared/types";
 import { create, del, merge } from "shared/actions";
@@ -7,6 +7,8 @@ import { serialize_lobby } from "shared/utils";
 const createLobbyEvent = ReplicatedStorage.WaitForChild("CreateLobbyEvent") as RemoteEvent;
 const joinLobbyEvent = ReplicatedStorage.WaitForChild("JoinLobbyEvent") as RemoteEvent;
 const leaveLobbyEvent = ReplicatedStorage.WaitForChild("LeaveLobbyEvent") as RemoteEvent;
+const startGameEvent = ReplicatedStorage.WaitForChild("StartGameEvent") as RemoteEvent;
+const placeId = 17410242416;
 
 createLobbyEvent.OnServerEvent.Connect((p) => {
 	const lobby: Lobby = {
@@ -64,6 +66,22 @@ leaveLobbyEvent.OnServerEvent.Connect((player) => {
 
 				store.dispatch(merge<Lobby>(owner as string, updatedLobby, "lobbies"));
 			}
+			break;
+		}
+	}
+});
+
+startGameEvent.OnServerEvent.Connect((player) => {
+	const lobbies = store.getState().lobbies as { [key: string]: Lobby };
+	for (const [owner, lobby] of pairs(lobbies)) {
+		if (lobby.owner === tostring(player.UserId)) {
+			// Teleport all players in the lobby to the game instance
+			const players = lobby.players;
+			for (const player of players) {
+				TeleportService.Teleport(placeId, player);
+			}
+			// Optionally, delete the lobby after teleporting
+			store.dispatch(del(owner as string, "lobbies"));
 			break;
 		}
 	}

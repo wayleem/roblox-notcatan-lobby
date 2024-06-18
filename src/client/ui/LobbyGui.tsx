@@ -7,6 +7,7 @@ import { Lobby } from "shared/types";
 import { merge } from "shared/actions";
 
 const leaveLobbyEvent = ReplicatedStorage.WaitForChild("LeaveLobbyEvent") as RemoteEvent;
+const startGameEvent = ReplicatedStorage.WaitForChild("StartGameEvent") as RemoteEvent;
 
 function LobbyGui() {
 	const [lobby, setLobby] = useState<Lobby | undefined>(local_store.getState().localLobby);
@@ -81,7 +82,10 @@ function LobbyGui() {
 						TextSize={18}
 						Font={Enum.Font.SourceSans}
 						Event={{
-							MouseButton1Click: () => {},
+							MouseButton1Click: () => {
+								print("starting game");
+								startGameEvent.FireServer();
+							},
 						}}
 					/>
 				)}
@@ -96,7 +100,6 @@ function LobbyGui() {
 					Event={{
 						MouseButton1Click: () => {
 							leaveLobbyEvent.FireServer();
-							print("player count after leaving: " + lobby.players.size());
 							local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
 						},
 					}}

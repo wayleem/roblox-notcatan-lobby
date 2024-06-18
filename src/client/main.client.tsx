@@ -25,6 +25,14 @@ serverToClientEvent.OnClientEvent.Connect((action: MyActions<any>) => {
 		}
 	}
 });
+Roact.mount(
+	<screengui IgnoreGuiInset={true}>
+		<Router />
+	</screengui>,
+	playerGui,
+	"Router",
+);
+
 Players.LocalPlayer.CharacterAdded.Connect(() => {
 	Roact.mount(
 		<screengui IgnoreGuiInset={true}>
