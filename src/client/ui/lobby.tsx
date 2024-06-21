@@ -1,15 +1,12 @@
 import Roact from "@rbxts/roact";
-import { Players, ReplicatedStorage } from "@rbxts/services";
+import { Players } from "@rbxts/services";
 import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "client/local_store";
-import { RouterState } from "client/local_store/route-reducer";
-import { Lobby } from "shared/types";
 import { merge } from "shared/actions";
+import { server } from "client/remote";
+import PlayerList from "./components/player_list";
 
-const leaveLobbyEvent = ReplicatedStorage.WaitForChild("LeaveLobbyEvent") as RemoteEvent;
-const startGameEvent = ReplicatedStorage.WaitForChild("StartGameEvent") as RemoteEvent;
-
-function LobbyGui() {
+const Lobby: Roact.FunctionComponent = () => {
 	const [lobby, setLobby] = useState<Lobby | undefined>(local_store.getState().localLobby);
 	const localPlayerId = tostring(Players.LocalPlayer.UserId);
 
@@ -24,13 +21,6 @@ function LobbyGui() {
 		return () => unsubscribe.disconnect();
 	}, []);
 
-	useEffect(() => {
-		if (lobby && lobby.owner) {
-			print("Lobby owner:", lobby.owner); // Debug statement
-			print("Local player ID:", localPlayerId); // Debug statement
-		}
-	}, [lobby]);
-
 	if (!lobby || !lobby.owner) {
 		print("Lobby state is undefined or owner is not set."); // Debug statement
 		return <textlabel Text="Loading..." Size={new UDim2(1, 0, 1, 0)} />;
@@ -38,19 +28,15 @@ function LobbyGui() {
 
 	const isOwner = lobby.owner === localPlayerId;
 
-	const players = lobby.players.map((player, index) => (
-		<textlabel
-			Key={tostring(player.UserId)}
-			Size={new UDim2(1, 0, 0, 50)}
-			Position={new UDim2(0, 0, 0, index * 55)}
-			BackgroundColor3={Color3.fromRGB(33, 33, 33)}
-			TextColor3={Color3.fromRGB(255, 255, 255)}
-			Text={player.Name}
-			TextSize={18}
-			Font={Enum.Font.SourceSans}
-			TextXAlignment={Enum.TextXAlignment.Left}
-		/>
-	));
+	const handleStartGame = () => {
+		print("starting game");
+		server.FireServer({ event: "START_GAME" });
+	};
+
+	const handleLeaveLobby = () => {
+		server.FireServer({ event: "LEAVE_LOBBY" });
+		local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
+	};
 
 	return (
 		<frame
@@ -60,14 +46,7 @@ function LobbyGui() {
 			BackgroundColor3={Color3.fromRGB(25, 25, 25)}
 			BorderSizePixel={0}
 		>
-			<scrollingframe
-				Size={new UDim2(1, 0, 0.75, 0)} // Adjusted to accommodate two buttons
-				CanvasSize={new UDim2(0, 0, 0, lobby.players.size() * 55)}
-				BackgroundTransparency={1}
-				ScrollBarThickness={6}
-			>
-				{players}
-			</scrollingframe>
+			<PlayerList players={lobby.players} />
 			<frame
 				Size={new UDim2(1, 0, 0.25, 0)} // Container for buttons
 				Position={new UDim2(0, 0, 0.75, 0)} // Positioned below the players list
@@ -82,10 +61,7 @@ function LobbyGui() {
 						TextSize={18}
 						Font={Enum.Font.SourceSans}
 						Event={{
-							MouseButton1Click: () => {
-								print("starting game");
-								startGameEvent.FireServer();
-							},
+							MouseButton1Click: handleStartGame,
 						}}
 					/>
 				)}
@@ -98,15 +74,12 @@ function LobbyGui() {
 					TextSize={18}
 					Font={Enum.Font.SourceSans}
 					Event={{
-						MouseButton1Click: () => {
-							leaveLobbyEvent.FireServer();
-							local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
-						},
+						MouseButton1Click: handleLeaveLobby,
 					}}
 				/>
 			</frame>
 		</frame>
 	);
-}
+};
 
-export default withHooks(LobbyGui);
+export default withHooks(Lobby);

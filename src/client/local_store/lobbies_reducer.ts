@@ -1,11 +1,6 @@
 import { MyActions } from "shared/actions";
-import { ArrayT, Lobby } from "shared/types";
 
-export interface LobbiesState {
-	lobbies: ArrayT<Lobby>;
-}
-
-export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {
+export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {
 	if (action.target === "lobbies") {
 		switch (action.type) {
 			case "CREATE":

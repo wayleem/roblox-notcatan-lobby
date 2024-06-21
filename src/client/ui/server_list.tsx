@@ -1,43 +1,10 @@
 import Roact from "@rbxts/roact";
 import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "../local_store";
-import { Lobby } from "shared/types";
-import { ArrayT } from "shared/types";
 import Object from "@rbxts/object-utils";
 import { merge } from "shared/actions";
-import { RouterState } from "client/local_store/route-reducer";
-import { ReplicatedStorage, Players } from "@rbxts/services";
-
-interface LobbyProps {
-	lobby: Lobby;
-	onClick: () => void;
-}
-
-const LobbyItem: Roact.FunctionComponent<LobbyProps> = ({ lobby, onClick }) => {
-	return (
-		<textbutton
-			Size={new UDim2(1, 0, 0, 50)} // Full width, height of 50 pixels
-			BackgroundColor3={Color3.fromRGB(33, 33, 33)} // Dark gray
-			BorderSizePixel={0}
-			Event={{
-				MouseButton1Click: onClick,
-			}}
-		>
-			<textlabel
-				Text={`Lobby Owner: ${lobby.owner} | Players: ${lobby.players.size()}`}
-				Size={new UDim2(1, -10, 1, -10)} // Slight padding
-				Position={new UDim2(0, 5, 0, 5)}
-				BackgroundTransparency={1} // Transparent background
-				TextColor3={Color3.fromRGB(255, 255, 255)} // White text
-				Font={Enum.Font.SourceSans} // Default Roblox font
-				TextSize={24}
-			/>
-		</textbutton>
-	);
-};
-
-const joinLobbyEvent = ReplicatedStorage.WaitForChild("JoinLobbyEvent") as RemoteEvent;
-const leaveLobbyEvent = ReplicatedStorage.WaitForChild("LeaveLobbyEvent") as RemoteEvent;
+import { server } from "client/remote";
+import LobbyItem from "./components/lobby_item";
 
 const ServerList: Roact.FunctionComponent = () => {
 	const [lobbies, setLobbies] = useState<ArrayT<Lobby>>(local_store.getState().lobbies);
@@ -51,13 +18,13 @@ const ServerList: Roact.FunctionComponent = () => {
 	}, []);
 
 	const handleLobbyClick = (lobby: Lobby) => {
-		joinLobbyEvent.FireServer(lobby.owner); // Send the lobby owner (or another identifier)
+		server.FireServer({ data: [lobby.owner], event: "JOIN_LOBBY" }); // Send the lobby owner (or another identifier)
 		local_store.dispatch(merge("current", lobby, "localLobby"));
 		local_store.dispatch(merge<RouterState>("", { route: "lobby" }, "router"));
 	};
 
 	const lobbyItems = Object.entries(lobbies)
-		.filter(([, lobby]) => lobby !== undefined && lobby!.players.size() > 0) // Filter lobbies with 0 players
+		.filter(([, lobby]) => lobby && lobby.players.size() > 0) // Filter lobbies with 0 players
 		.map(([owner, lobby]) => <LobbyItem Key={owner} lobby={lobby!} onClick={() => handleLobbyClick(lobby!)} />); // Use Key instead of key
 
 	return (
@@ -87,7 +54,7 @@ const ServerList: Roact.FunctionComponent = () => {
 				AnchorPoint={new Vector2(0, 1)} // Anchor to the bottom
 				Event={{
 					MouseButton1Click: () => {
-						leaveLobbyEvent.FireServer();
+						server.FireServer({ event: "LEAVE_LOBBY" });
 						local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
 					},
 				}}

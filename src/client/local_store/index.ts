@@ -1,14 +1,12 @@
 import { Store, combineReducers } from "@rbxts/rodux";
-import { lobbies_reducer } from "./lobbies-reducer";
-import { gui_reducer } from "./gui-reducer";
-import { local_lobby_reducer } from "./local-lobby-reducer";
-import { router_reducer } from "./route-reducer";
+import { lobbiesReducer } from "./lobbies_reducer";
+import { localLobbyReducer } from "./local_lobby_reducer";
+import { routerReducer } from "./route_reducer";
 
-const root_reducer = combineReducers({
-	lobbies: lobbies_reducer,
-	gui: gui_reducer,
-	localLobby: local_lobby_reducer,
-	router: router_reducer,
+const rootReducer = combineReducers({
+	lobbies: lobbiesReducer,
+	localLobby: localLobbyReducer,
+	router: routerReducer,
 });
 
-export const local_store = new Store(root_reducer);
+export const local_store = new Store(rootReducer);

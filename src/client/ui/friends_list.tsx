@@ -1,7 +1,7 @@
 import Roact from "@rbxts/roact";
 
-function FriendListGui() {
+function FriendsList() {
 	return <frame Key="Friend List" />;
 }
 
-export default FriendListGui;
+export default FriendsList;

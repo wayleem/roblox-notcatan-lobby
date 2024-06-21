@@ -1,26 +1,19 @@
-import Object from "@rbxts/object-utils";
-import { Players, ReplicatedStorage } from "@rbxts/services";
+import { Players } from "@rbxts/services";
+import { clients } from "server/events";
 import { MyActions } from "shared/actions";
-import { ArrayT, Lobby } from "shared/types";
-import { deserialize_userid } from "shared/utils";
+import { deserializeUserId } from "shared/utils";
 
-export interface LobbiesState {
-	lobbies: ArrayT<Lobby>;
-}
-
-const remoteEvent = ReplicatedStorage.WaitForChild("UpdateClientEvent") as RemoteEvent;
-
-export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {
+export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {
 	if (action.target === "lobbies")
 		switch (action.type) {
 			case "CREATE":
-				remoteEvent.FireAllClients(action);
+				clients.FireAllClients(action);
 				return {
 					...state,
 					[action.id]: action.data,
 				};
 			case "MERGE":
-				remoteEvent.FireAllClients(action);
+				clients.FireAllClients(action);
 				const currentState = state[action.id];
 				if (currentState) {
 					return {
@@ -33,7 +26,7 @@ export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lob
 				}
 				return state;
 			case "UPDATE_KEY":
-				remoteEvent.FireAllClients(action);
+				clients.FireAllClients(action);
 				const keyToUpdate = state[action.id];
 				if (keyToUpdate && action.key in keyToUpdate) {
 					return {
@@ -46,13 +39,13 @@ export function lobbies_reducer(state: ArrayT<Lobby> = {}, action: MyActions<Lob
 				}
 				return state;
 			case "DEL":
-				remoteEvent.FireAllClients(action);
+				clients.FireAllClients(action);
 				const newState = { ...state };
 				delete newState[action.id];
 				return newState;
 			case "PING":
-				const localPlayer = Players.GetPlayerByUserId(deserialize_userid(action.id));
-				if (localPlayer) remoteEvent.FireClient(localPlayer, action);
+				const localPlayer = Players.GetPlayerByUserId(deserializeUserId(action.id));
+				if (localPlayer) clients.FireClient(localPlayer, action);
 				return state;
 		}
 	return state;

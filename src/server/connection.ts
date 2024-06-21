@@ -1,22 +1,21 @@
-import { create, del, flush } from "shared/actions";
+import { flush } from "shared/actions";
 import { store } from "server/store";
 import { Players } from "@rbxts/services";
-import Object from "@rbxts/object-utils";
-import { serialize_userid } from "shared/utils";
+import { serializeUserId } from "shared/utils";
 
 Players.PlayerAdded.Connect((player) => {
 	print("player joined:", player.Name);
-	on_player_join(player);
+	onPlayerJoin(player);
 });
 Players.PlayerRemoving.Connect((player) => {
 	print("Player leaving:", player.Name);
-	on_player_leave(player);
+	onPlayerLeave(player);
 });
 
-function on_player_join(player: Player) {
+function onPlayerJoin(player: Player) {
 	const playerId = player.UserId;
 
-	store.dispatch(flush(serialize_userid(playerId), store.getState().lobbies, "lobbies"));
+	store.dispatch(flush(serializeUserId(playerId), store.getState().lobbies, "lobbies"));
 }
 
-function on_player_leave(player: Player) {}
+function onPlayerLeave(player: Player) {}
