@@ -7,8 +7,8 @@ interface PlayerListProps {
 const PlayerList: Roact.FunctionComponent<PlayerListProps> = ({ players }) => {
 	return (
 		<scrollingframe
-			Size={new UDim2(1, 0, 0.75, 0)} // Adjusted to accommodate two buttons
-			CanvasSize={new UDim2(0, 0, 0, players.size() * 55)}
+			Size={UDim2.fromScale(1, 0.75)}
+			CanvasSize={UDim2.fromOffset(0, players.size() * 55)}
 			BackgroundTransparency={1}
 			ScrollBarThickness={6}
 		>
@@ -17,8 +17,8 @@ const PlayerList: Roact.FunctionComponent<PlayerListProps> = ({ players }) => {
 					Key={tostring(player.UserId)}
 					Size={new UDim2(1, 0, 0, 50)}
 					Position={new UDim2(0, 0, 0, index * 55)}
-					BackgroundColor3={Color3.fromRGB(33, 33, 33)}
-					TextColor3={Color3.fromRGB(255, 255, 255)}
+					BackgroundColor3={new Color3(0.129, 0.129, 0.129)}
+					TextColor3={new Color3(1, 1, 1)}
 					Text={player.Name}
 					TextSize={18}
 					Font={Enum.Font.SourceSans}

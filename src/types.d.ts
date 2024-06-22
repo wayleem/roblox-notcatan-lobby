@@ -12,4 +12,4 @@ interface EventPayload {
 	event: string;
 }
 
-type route = "menu" | "friends" | "server" | "lobby";
+type Route = "menu" | "friends" | "server" | "lobby";

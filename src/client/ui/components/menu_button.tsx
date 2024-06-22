@@ -7,7 +7,7 @@ import Object from "@rbxts/object-utils";
 
 interface ButtonProps {
 	text: string;
-	to: route;
+	to: Route;
 	order: number;
 	event?: string;
 }
@@ -22,7 +22,6 @@ const MenuButton: Roact.FunctionComponent<ButtonProps> = ({ text, to, order, eve
 			owner: tostring(Players.LocalPlayer.UserId),
 			players: [Players.LocalPlayer],
 		};
-		local_store.dispatch(merge("current", newLobby, "localLobby"));
 		local_store.dispatch(merge<RouterState>("", { route: to }, "router"));
 		print("lobbies: " + Object.entries(local_store.getState().lobbies));
 	};
@@ -30,10 +29,10 @@ const MenuButton: Roact.FunctionComponent<ButtonProps> = ({ text, to, order, eve
 	return (
 		<textbutton
 			LayoutOrder={order}
-			Size={new UDim2(0.8, 0, 0, 50)} // Width of 80%, height of 50 pixels
-			BackgroundColor3={Color3.fromRGB(33, 33, 33)} // Dark gray
-			TextColor3={Color3.fromRGB(255, 255, 255)} // White text
-			Font={Enum.Font.SourceSans} // Default Roblox font
+			Size={new UDim2(0.8, 0, 0, 50)}
+			BackgroundColor3={Color3.fromRGB(33, 33, 33)}
+			TextColor3={Color3.fromRGB(255, 255, 255)}
+			Font={Enum.Font.SourceSans}
 			TextSize={24}
 			Text={text}
 			BorderSizePixel={0}

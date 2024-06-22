@@ -7,35 +7,27 @@ import { server } from "client/remote";
 import PlayerList from "./components/player_list";
 
 const Lobby: Roact.FunctionComponent = () => {
-	const [lobby, setLobby] = useState<Lobby | undefined>(local_store.getState().localLobby);
+	const [lobby, setLobby] = useState<Lobby>(local_store.getState().localLobby);
 	const localPlayerId = tostring(Players.LocalPlayer.UserId);
 
 	useEffect(() => {
 		const unsubscribe = local_store.changed.connect(() => {
-			const state = local_store.getState();
-			const currentLobby = state.localLobby;
-			print("Updated lobby state:", currentLobby); // Debug statement
+			const currentLobby = local_store.getState().localLobby;
+			print("Updated lobby state:", currentLobby);
 			setLobby(currentLobby);
 		});
-
 		return () => unsubscribe.disconnect();
 	}, []);
-
-	if (!lobby || !lobby.owner) {
-		print("Lobby state is undefined or owner is not set."); // Debug statement
-		return <textlabel Text="Loading..." Size={new UDim2(1, 0, 1, 0)} />;
-	}
 
 	const isOwner = lobby.owner === localPlayerId;
 
 	const handleStartGame = () => {
-		print("starting game");
+		print("Starting game");
 		server.FireServer({ event: "START_GAME" });
 	};
 
 	const handleLeaveLobby = () => {
 		server.FireServer({ event: "LEAVE_LOBBY" });
-		local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
 	};
 
 	return (

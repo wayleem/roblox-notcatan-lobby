@@ -19,8 +19,6 @@ const ServerList: Roact.FunctionComponent = () => {
 
 	const handleLobbyClick = (lobby: Lobby) => {
 		server.FireServer({ data: [lobby.owner], event: "JOIN_LOBBY" }); // Send the lobby owner (or another identifier)
-		local_store.dispatch(merge("current", lobby, "localLobby"));
-		local_store.dispatch(merge<RouterState>("", { route: "lobby" }, "router"));
 	};
 
 	const lobbyItems = Object.entries(lobbies)
@@ -54,7 +52,6 @@ const ServerList: Roact.FunctionComponent = () => {
 				AnchorPoint={new Vector2(0, 1)} // Anchor to the bottom
 				Event={{
 					MouseButton1Click: () => {
-						server.FireServer({ event: "LEAVE_LOBBY" });
 						local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
 					},
 				}}

@@ -7,7 +7,6 @@ export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobb
 	if (action.target === "lobbies")
 		switch (action.type) {
 			case "CREATE":
-				clients.FireAllClients(action);
 				return {
 					...state,
 					[action.id]: action.data,
@@ -26,7 +25,6 @@ export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobb
 				}
 				return state;
 			case "UPDATE_KEY":
-				clients.FireAllClients(action);
 				const keyToUpdate = state[action.id];
 				if (keyToUpdate && action.key in keyToUpdate) {
 					return {
@@ -39,13 +37,10 @@ export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobb
 				}
 				return state;
 			case "DEL":
-				clients.FireAllClients(action);
 				const newState = { ...state };
 				delete newState[action.id];
 				return newState;
 			case "PING":
-				const localPlayer = Players.GetPlayerByUserId(deserializeUserId(action.id));
-				if (localPlayer) clients.FireClient(localPlayer, action);
 				return state;
 		}
 	return state;
