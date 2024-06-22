@@ -3,6 +3,7 @@ export const initialRouter: RouterState = {
 };
 
 export const initLobbyState: Lobby = {
+	id: "",
 	owner: "",
 	players: [],
 };

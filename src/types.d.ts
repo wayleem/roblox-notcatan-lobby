@@ -3,6 +3,7 @@ interface ArrayT<T> {
 }
 
 interface Lobby {
+	id: string;
 	owner: string;
 	players: Player[];
 }

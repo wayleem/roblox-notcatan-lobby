@@ -7,7 +7,7 @@ interface PlayerListProps {
 const PlayerList: Roact.FunctionComponent<PlayerListProps> = ({ players }) => {
 	return (
 		<scrollingframe
-			Size={UDim2.fromScale(1, 0.75)}
+			Size={UDim2.fromScale(1, 1)} // Full size of the parent frame
 			CanvasSize={UDim2.fromOffset(0, players.size() * 55)}
 			BackgroundTransparency={1}
 			ScrollBarThickness={6}

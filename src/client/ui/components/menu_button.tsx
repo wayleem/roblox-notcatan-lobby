@@ -18,10 +18,6 @@ const MenuButton: Roact.FunctionComponent<ButtonProps> = ({ text, to, order, eve
 			server.FireServer({ event });
 			print("fired: " + event);
 		}
-		const newLobby: Lobby = {
-			owner: tostring(Players.LocalPlayer.UserId),
-			players: [Players.LocalPlayer],
-		};
 		local_store.dispatch(merge<RouterState>("", { route: to }, "router"));
 		print("lobbies: " + Object.entries(local_store.getState().lobbies));
 	};

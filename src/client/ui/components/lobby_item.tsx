@@ -16,7 +16,7 @@ const LobbyItem: Roact.FunctionComponent<LobbyProps> = ({ lobby, onClick }) => {
 			}}
 		>
 			<textlabel
-				Text={`Lobby Owner: ${lobby.owner} | Players: ${lobby.players.size()}`}
+				Text={`Id: ${lobby.id} | Lobby Owner: ${lobby.owner} | Players: ${lobby.players.size()}`}
 				Size={new UDim2(1, -10, 1, -10)} // Slight padding
 				Position={new UDim2(0, 5, 0, 5)}
 				BackgroundTransparency={1} // Transparent background

@@ -1,4 +1,4 @@
-import { TeleportService } from "@rbxts/services";
+import { TeleportService, HttpService } from "@rbxts/services";
 import { store } from "./store";
 import { MyActions, create, del, merge } from "shared/actions";
 import { clients } from "./events";
@@ -7,7 +7,7 @@ import { initLobbyState } from "shared/store";
 
 const LobbyManager = (() => {
 	function updateClientState(player: Player, localLobby: Lobby | typeof initLobbyState, route: Route) {
-		clients.FireClient(player, merge("current", localLobby, "localLobby"));
+		clients.FireClient(player, merge("", localLobby, "localLobby"));
 		clients.FireClient(player, merge("", { route }, "router"));
 	}
 
@@ -39,35 +39,33 @@ const LobbyManager = (() => {
 
 	return {
 		createLobby(player: Player): void {
+			const lobbyId = HttpService.GenerateGUID(false);
 			const lobby: Lobby = {
+				id: lobbyId,
 				owner: tostring(player.UserId),
 				players: [player],
 			};
-			const action = create(lobby.owner, lobby, "lobbies");
+			const action = create(lobbyId, lobby, "lobbies");
 			broadcastLobbyUpdate(action);
 			updateClientState(player, lobby, "lobby");
-			print(`New lobby created by: ${lobby.owner}`);
+			print(`New lobby created with ID: ${lobbyId}`);
 		},
 
-		joinLobby(player: Player, lobbyOwner: string): void {
+		joinLobby(player: Player, lobbyId: string): void {
 			const lobbies = store.getState().lobbies as Record<string, Lobby>;
-			const lobby = lobbies[lobbyOwner];
+			const lobby = lobbies[lobbyId];
 			if (lobby) {
 				const updatedLobby: Lobby = {
 					...lobby,
 					players: [...lobby.players, player],
 				};
-				const action = merge<Lobby>(lobbyOwner, updatedLobby, "lobbies");
+				const action = merge<Lobby>(lobbyId, updatedLobby, "lobbies");
 
-				// Update the store
 				broadcastLobbyUpdate(action);
-
-				// Update all players in the lobby, including the owner
 				updateLobbyMembers(updatedLobby);
-
-				print(`Player joined lobby of: ${lobbyOwner}`);
+				print(`Player joined lobby: ${lobbyId}`);
 			} else {
-				print(`Lobby not found for owner: ${lobbyOwner}`);
+				print(`Lobby not found: ${lobbyId}`);
 			}
 		},
 
@@ -75,33 +73,32 @@ const LobbyManager = (() => {
 			const lobbies = store.getState().lobbies as Record<string, Lobby>;
 			const lobbyEntry = Object.entries(lobbies).find(([_, lobby]) => lobby.players.includes(player));
 			if (!lobbyEntry) return;
-			const [owner, lobby] = lobbyEntry;
+			const [lobbyId, lobby] = lobbyEntry;
 			const updatedLobby = removePlayerFromLobby(lobby, player);
 			let action;
 			if (updatedLobby.players.size() === 0) {
-				action = del(owner, "lobbies");
-				print(`Deleting lobby owned by: ${lobby.owner}`);
+				action = del(lobbyId, "lobbies");
+				print(`Deleting lobby: ${lobbyId}`);
 				broadcastLobbyUpdate(action);
-				clients.FireClient(player, merge("current", initLobbyState, "localLobby")); // Update the client state to clear the local lobby
+				clients.FireClient(player, merge("current", initLobbyState, "localLobby"));
 				updateClientState(player, initLobbyState, "menu");
 			} else if (lobby.owner === tostring(player.UserId)) {
 				const newLobby = transferOwnership(updatedLobby);
-				action = merge(owner, newLobby, "lobbies");
+				action = merge(lobbyId, newLobby, "lobbies");
 				broadcastLobbyUpdate(action);
-				updateLobbyMembers(newLobby); // Ensure all clients see the new owner
-				// Update new owner's client state
+				updateLobbyMembers(newLobby);
 				const newOwner = newLobby.players.find((p) => tostring(p.UserId) === newLobby.owner);
 				if (newOwner) {
 					updateClientState(newOwner, newLobby, "lobby");
 				}
 				updateClientState(player, initLobbyState, "menu");
-				print("leaving lobby of: " + newLobby.owner);
+				print(`Ownership transferred in lobby: ${lobbyId}`);
 			} else {
-				action = merge(owner, updatedLobby, "lobbies");
+				action = merge(lobbyId, updatedLobby, "lobbies");
 				broadcastLobbyUpdate(action);
-				updateLobbyMembers(updatedLobby); // Ensure all clients see the updated lobby
+				updateLobbyMembers(updatedLobby);
 				updateClientState(player, initLobbyState, "menu");
-				print("leaving lobby of: " + updatedLobby.owner);
+				print(`Player left lobby: ${lobbyId}`);
 			}
 		},
 
@@ -110,10 +107,11 @@ const LobbyManager = (() => {
 			const lobbies = store.getState().lobbies as Record<string, Lobby>;
 			const playerLobby = Object.entries(lobbies).find(([_, lobby]) => lobby.owner === tostring(player.UserId));
 			if (playerLobby) {
-				const [owner, lobby] = playerLobby;
+				const [lobbyId, lobby] = playerLobby;
 				lobby.players.forEach((player) => TeleportService.Teleport(placeId, player));
-				const action = del(owner, "lobbies");
+				const action = del(lobbyId, "lobbies");
 				broadcastLobbyUpdate(action);
+				print(`Starting game for lobby: ${lobbyId}`);
 			}
 		},
 	};

@@ -1,7 +1,4 @@
-import { Players } from "@rbxts/services";
-import { clients } from "server/events";
 import { MyActions } from "shared/actions";
-import { deserializeUserId } from "shared/utils";
 
 export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {
 	if (action.target === "lobbies")
@@ -12,7 +9,6 @@ export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobb
 					[action.id]: action.data,
 				};
 			case "MERGE":
-				clients.FireAllClients(action);
 				const currentState = state[action.id];
 				if (currentState) {
 					return {

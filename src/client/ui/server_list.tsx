@@ -1,10 +1,10 @@
+import { server } from "client/remote";
 import Roact from "@rbxts/roact";
 import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
 import { local_store } from "../local_store";
 import Object from "@rbxts/object-utils";
-import { merge } from "shared/actions";
-import { server } from "client/remote";
 import LobbyItem from "./components/lobby_item";
+import { merge } from "shared/actions";
 
 const ServerList: Roact.FunctionComponent = () => {
 	const [lobbies, setLobbies] = useState<ArrayT<Lobby>>(local_store.getState().lobbies);
@@ -18,12 +18,12 @@ const ServerList: Roact.FunctionComponent = () => {
 	}, []);
 
 	const handleLobbyClick = (lobby: Lobby) => {
-		server.FireServer({ data: [lobby.owner], event: "JOIN_LOBBY" }); // Send the lobby owner (or another identifier)
+		server.FireServer({ data: [lobby.id], event: "JOIN_LOBBY" }); // Send the lobby id instead of owner
 	};
 
 	const lobbyItems = Object.entries(lobbies)
-		.filter(([, lobby]) => lobby && lobby.players.size() > 0) // Filter lobbies with 0 players
-		.map(([owner, lobby]) => <LobbyItem Key={owner} lobby={lobby!} onClick={() => handleLobbyClick(lobby!)} />); // Use Key instead of key
+		.filter(([, lobby]) => lobby && lobby.players.size() > 0)
+		.map(([id, lobby]) => <LobbyItem Key={id} lobby={lobby!} onClick={() => handleLobbyClick(lobby!)} />);
 
 	return (
 		<frame
