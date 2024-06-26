@@ -1,3 +1,5 @@
+/* store.d.ts */
+
 interface LobbiesState {
 	lobbies: ArrayT<Lobby>;
 }

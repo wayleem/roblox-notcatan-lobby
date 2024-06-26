@@ -1,3 +1,5 @@
+/* client/local_store/index.ts */
+
 import { Store, combineReducers } from "@rbxts/rodux";
 import { lobbiesReducer } from "./lobbies_reducer";
 import { localLobbyReducer } from "./local_lobby_reducer";

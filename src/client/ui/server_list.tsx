@@ -1,3 +1,5 @@
+/* client/ui/server_list.tsx */
+
 import { server } from "client/remote";
 import Roact from "@rbxts/roact";
 import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";

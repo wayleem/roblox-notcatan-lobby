@@ -1,3 +1,5 @@
+/* client/ui/components/player_list.tsx */
+
 import Roact from "@rbxts/roact";
 
 interface PlayerListProps {

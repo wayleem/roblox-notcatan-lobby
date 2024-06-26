@@ -1,3 +1,5 @@
+/* main.server.ts */
+
 import { makeHello } from "shared/module";
 import "./events";
 import "./connection";

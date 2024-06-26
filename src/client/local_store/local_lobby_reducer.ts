@@ -1,3 +1,5 @@
+/* client/local_store/local_lobby_reducer.ts */
+
 import { MyActions } from "shared/actions";
 import { initLobbyState } from "shared/store";
 

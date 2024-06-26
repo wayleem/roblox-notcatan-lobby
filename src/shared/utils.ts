@@ -1,3 +1,5 @@
+/* shared/utils.ts */
+
 export function serializeUserId(userId: number): string {
 	return `player:${userId}`;
 }

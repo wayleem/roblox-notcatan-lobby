@@ -1,3 +1,5 @@
+/* server/events.ts */
+
 import { ReplicatedStorage } from "@rbxts/services";
 
 export const server = new Instance("RemoteEvent", ReplicatedStorage) as RemoteEvent;

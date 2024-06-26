@@ -1,3 +1,5 @@
+/* client/remote.ts */
+
 import { ReplicatedStorage } from "@rbxts/services";
 import { merge, MyActions } from "shared/actions";
 import { local_store } from "./local_store";

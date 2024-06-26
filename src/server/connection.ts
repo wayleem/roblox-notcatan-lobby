@@ -1,3 +1,5 @@
+/* server/connection.ts */
+
 import { flush } from "shared/actions";
 import { store } from "server/store";
 import { Players } from "@rbxts/services";

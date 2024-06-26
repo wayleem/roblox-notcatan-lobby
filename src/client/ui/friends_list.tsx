@@ -1,3 +1,5 @@
+/* client/ui/friends_list.tsx */
+
 import Roact from "@rbxts/roact";
 
 function FriendsList() {

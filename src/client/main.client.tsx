@@ -1,3 +1,5 @@
+/* client/main.client.tsx */
+
 import "./remote";
 import "./ui";
 

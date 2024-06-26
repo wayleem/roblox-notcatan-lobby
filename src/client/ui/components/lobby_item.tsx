@@ -1,3 +1,5 @@
+/* client/ui/components/lobby_item.tsx */
+
 import Roact from "@rbxts/roact";
 
 interface LobbyProps {

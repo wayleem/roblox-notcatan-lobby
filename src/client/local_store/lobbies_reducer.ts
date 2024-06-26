@@ -1,3 +1,5 @@
+/* client/local_store/lobbies_reducer.ts */
+
 import { MyActions } from "shared/actions";
 
 export function lobbiesReducer(state: ArrayT<Lobby> = {}, action: MyActions<Lobby>): ArrayT<Lobby> {

@@ -1,3 +1,5 @@
+/* server/remote.ts */
+
 import handleEvent from "./event_handlers";
 import { server } from "./events";
 import { parseEventPayload } from "shared/utils";

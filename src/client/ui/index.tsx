@@ -1,3 +1,5 @@
+/* client/ui/index.tsx */
+
 import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
 import Router from "./router";

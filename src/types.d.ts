@@ -1,3 +1,5 @@
+/* types.d.ts */
+
 interface ArrayT<T> {
 	[key: string]: T | undefined;
 }

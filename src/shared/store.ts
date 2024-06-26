@@ -1,3 +1,7 @@
+/* shared/store.ts
+ * initial state constants to be exported here
+ */
+
 export const initialRouter: RouterState = {
 	route: "menu",
 };

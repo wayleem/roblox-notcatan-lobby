@@ -1,3 +1,5 @@
+/* shared/actions.ts */
+
 type Action_Create<T> = { id: string; data: T; type: "CREATE"; target: string };
 type Action_Merge<T> = { id: string; data: Partial<T>; type: "MERGE"; target: string };
 type Action_Update<T> = {
