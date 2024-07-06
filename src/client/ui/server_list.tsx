@@ -1,26 +1,28 @@
 /* client/ui/server_list.tsx */
 
-import { server } from "client/remote";
+import { client, requestToServer } from "client/remote";
 import Roact from "@rbxts/roact";
 import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
-import { local_store } from "../local_store";
 import Object from "@rbxts/object-utils";
 import LobbyItem from "./components/lobby_item";
-import { merge } from "shared/actions";
 
 const ServerList: Roact.FunctionComponent = () => {
-	const [lobbies, setLobbies] = useState<ArrayT<Lobby>>(local_store.getState().lobbies);
+	const [lobbies, setLobbies] = useState<Lobby[]>([]);
 
 	useEffect(() => {
-		const unsubscribe = local_store.changed.connect(() => {
-			setLobbies(local_store.getState().lobbies);
+		requestToServer("GET_LOBBIES");
+
+		const connection = client.OnClientEvent.Connect((payload: EventPayload) => {
+			if (payload.event === "LOBBIES_DATA" && payload.data) {
+				setLobbies(payload.data as Lobby[]);
+			}
 		});
 
-		return () => unsubscribe.disconnect();
+		return () => connection.Disconnect();
 	}, []);
 
 	const handleLobbyClick = (lobby: Lobby) => {
-		server.FireServer({ data: [lobby.id], event: "JOIN_LOBBY" }); // Send the lobby id instead of owner
+		requestToServer("JOIN_LOBBY", [lobby.id]);
 	};
 
 	const lobbyItems = Object.entries(lobbies)
@@ -54,7 +56,7 @@ const ServerList: Roact.FunctionComponent = () => {
 				AnchorPoint={new Vector2(0, 1)} // Anchor to the bottom
 				Event={{
 					MouseButton1Click: () => {
-						local_store.dispatch(merge<RouterState>("", { route: "menu" }, "router"));
+						requestToServer("CHANGE_ROUTE", ["menu"]);
 					},
 				}}
 			/>

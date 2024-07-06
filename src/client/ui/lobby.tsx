@@ -1,32 +1,38 @@
+/* client/ui/lobby.tsx */
+
 import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
 import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
-import { local_store } from "client/local_store";
-import { server } from "client/remote";
+import { client, requestToServer, server } from "client/remote";
 import PlayerList from "./components/player_list";
 
 const Lobby: Roact.FunctionComponent = () => {
-	const [lobby, setLobby] = useState<Lobby>(local_store.getState().localLobby);
+	const [lobby, setLobby] = useState<Lobby | null>(null);
 	const localPlayerId = tostring(Players.LocalPlayer.UserId);
 
 	useEffect(() => {
-		const unsubscribe = local_store.changed.connect(() => {
-			const currentLobby = local_store.getState().localLobby;
-			print("Updated lobby state:", currentLobby);
-			setLobby(currentLobby);
+		// Request lobby data
+		requestToServer("GET_LOBBY_DATA");
+
+		const connection = client.OnClientEvent.Connect((payload: EventPayload) => {
+			if (payload.event === "LOBBY_DATA" && payload.data) {
+				setLobby(payload.data[0] as Lobby);
+			}
 		});
-		return () => unsubscribe.disconnect();
+
+		return () => connection.Disconnect();
 	}, []);
+
+	if (!lobby) return <textlabel Text="Loading..." />;
 
 	const isOwner = lobby.owner === localPlayerId;
 
 	const handleStartGame = () => {
-		print("Starting game");
-		server.FireServer({ event: "START_GAME" });
+		requestToServer("START_GAME");
 	};
 
 	const handleLeaveLobby = () => {
-		server.FireServer({ event: "LEAVE_LOBBY" });
+		requestToServer("LEAVE_LOBBY");
 	};
 
 	return (
