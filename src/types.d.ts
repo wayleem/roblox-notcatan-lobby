@@ -6,11 +6,8 @@ interface Lobby {
 	players: string[]; // Array of player IDs
 }
 
-type Route = "menu" | "friends" | "server" | "lobby";
-
 interface PlayerState {
-	currentLobby: string | null;
-	route: Route;
+	currentLobby: string | undefined;
 }
 
 interface Payload<T = unknown> {
@@ -20,9 +17,6 @@ interface Payload<T = unknown> {
 
 interface SharedState {
 	lobbies: Record<string, Lobby>;
-	router: {
-		route: Route;
-	};
 }
 
 interface ServerState {

@@ -2,17 +2,27 @@
 
 import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
-import Router from "./router";
-import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
-import { local_store } from "client/local_store";
-import Object from "@rbxts/object-utils";
+import { Router, RouterProvider } from "./router";
+import Menu from "./menu";
+import FriendsList from "./friends_list";
+import ServerList from "./server_list";
+import Lobby from "./lobby";
 
 const playerGui = Players.LocalPlayer.WaitForChild("PlayerGui") as PlayerGui;
 
+const routes: Record<string, Roact.FunctionComponent> = {
+	menu: Menu,
+	friends: FriendsList,
+	server: ServerList,
+	lobby: Lobby,
+};
+
 Roact.mount(
-	<screengui IgnoreGuiInset={true}>
-		<Router />
-	</screengui>,
+	<RouterProvider>
+		<screengui IgnoreGuiInset={true}>
+			<Router routes={routes} />
+		</screengui>
+	</RouterProvider>,
 	playerGui,
 	"Router",
 );

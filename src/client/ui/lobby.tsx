@@ -1,38 +1,35 @@
 /* client/ui/lobby.tsx */
-
 import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
 import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
-import { client, requestToServer, server } from "client/remote";
 import PlayerList from "./components/player_list";
+import { useRouter } from "./router";
+import Object from "@rbxts/object-utils";
+import { clientStore } from "client/store";
 
-const Lobby: Roact.FunctionComponent = () => {
-	const [lobby, setLobby] = useState<Lobby | null>(null);
+const Lobby: Roact.FunctionComponent = withHooks(() => {
+	const [lobby, setLobby] = useState<Lobby | undefined>(undefined);
 	const localPlayerId = tostring(Players.LocalPlayer.UserId);
+	const { navigate } = useRouter();
 
 	useEffect(() => {
-		// Request lobby data
-		requestToServer("GET_LOBBY_DATA");
-
-		const connection = client.OnClientEvent.Connect((payload: EventPayload) => {
-			if (payload.event === "LOBBY_DATA" && payload.data) {
-				setLobby(payload.data[0] as Lobby);
-			}
-		});
-
-		return () => connection.Disconnect();
-	}, []);
+		const currentLobby = Object.values(clientStore.getState().lobbies).find((l) =>
+			l.players.includes(localPlayerId),
+		);
+		setLobby(currentLobby || undefined);
+	}, [localPlayerId]);
 
 	if (!lobby) return <textlabel Text="Loading..." />;
 
 	const isOwner = lobby.owner === localPlayerId;
 
 	const handleStartGame = () => {
-		requestToServer("START_GAME");
+		clientStore.sendToServer("START_GAME", lobby.id);
 	};
 
 	const handleLeaveLobby = () => {
-		requestToServer("LEAVE_LOBBY");
+		clientStore.sendToServer("LEAVE_LOBBY", lobby.id);
+		navigate("menu");
 	};
 
 	return (
@@ -52,21 +49,13 @@ const Lobby: Roact.FunctionComponent = () => {
 				TextSize={18}
 				Font={Enum.Font.SourceSans}
 			/>
-			<frame
-				Size={new UDim2(1, 0, 0.6, 0)} // Adjust height to fit below the text label
-				Position={new UDim2(0, 0, 0.1, 0)} // Adjust position to leave space for the text label
-				BackgroundTransparency={1}
-			>
+			<frame Size={new UDim2(1, 0, 0.6, 0)} Position={new UDim2(0, 0, 0.1, 0)} BackgroundTransparency={1}>
 				<PlayerList players={lobby.players} />
 			</frame>
-			<frame
-				Size={new UDim2(1, 0, 0.25, 0)} // Container for buttons
-				Position={new UDim2(0, 0, 0.75, 0)} // Positioned below the players list
-				BackgroundTransparency={1}
-			>
+			<frame Size={new UDim2(1, 0, 0.25, 0)} Position={new UDim2(0, 0, 0.75, 0)} BackgroundTransparency={1}>
 				{isOwner && (
 					<textbutton
-						Size={new UDim2(0.5, 0, 1, 0)} // Half width for each button if owner
+						Size={new UDim2(0.5, 0, 1, 0)}
 						BackgroundColor3={Color3.fromRGB(45, 45, 45)}
 						TextColor3={Color3.fromRGB(255, 255, 255)}
 						Text="Start Game"
@@ -78,7 +67,7 @@ const Lobby: Roact.FunctionComponent = () => {
 					/>
 				)}
 				<textbutton
-					Size={new UDim2(isOwner ? 0.5 : 1, 0, 1, 0)} // Full width if not owner, half if owner
+					Size={new UDim2(isOwner ? 0.5 : 1, 0, 1, 0)}
 					Position={isOwner ? new UDim2(0.5, 0, 0, 0) : new UDim2(0, 0, 0, 0)}
 					BackgroundColor3={Color3.fromRGB(45, 45, 45)}
 					TextColor3={Color3.fromRGB(255, 255, 255)}
@@ -92,6 +81,6 @@ const Lobby: Roact.FunctionComponent = () => {
 			</frame>
 		</frame>
 	);
-};
+});
 
-export default withHooks(Lobby);
+export default Lobby;

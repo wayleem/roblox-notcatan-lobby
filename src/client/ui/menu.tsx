@@ -1,5 +1,4 @@
 /* client/ui/menu.tsx */
-
 import Roact from "@rbxts/roact";
 import { withHooks } from "@rbxts/roact-hooked";
 import MenuButton from "./components/menu_button";
@@ -8,10 +7,10 @@ const Menu: Roact.FunctionComponent = () => {
 	return (
 		<frame
 			Key="Menu"
-			Size={new UDim2(1 / 3, 0, 1, 0)} // 1/3 of the width, full height
-			Position={new UDim2(0, 0, 0, 0)} // Positioned at the top-left corner
-			BackgroundColor3={Color3.fromRGB(45, 45, 45)} // Dark background
-			BackgroundTransparency={0.5} // Semi-transparent
+			Size={new UDim2(1 / 3, 0, 1, 0)}
+			Position={new UDim2(0, 0, 0, 0)}
+			BackgroundColor3={Color3.fromRGB(45, 45, 45)}
+			BackgroundTransparency={0.5}
 			BorderSizePixel={0}
 		>
 			<uilistlayout

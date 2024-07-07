@@ -7,9 +7,6 @@ remoteEvent.Parent = ReplicatedStorage;
 
 const initSharedState: SharedState = {
 	lobbies: {},
-	router: {
-		route: "menu",
-	},
 };
 
 const initServerState: ServerState = {

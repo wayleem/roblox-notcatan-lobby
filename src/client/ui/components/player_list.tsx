@@ -3,7 +3,7 @@
 import Roact from "@rbxts/roact";
 
 interface PlayerListProps {
-	players: Player[];
+	players: string[];
 }
 
 const PlayerList: Roact.FunctionComponent<PlayerListProps> = ({ players }) => {
@@ -16,12 +16,12 @@ const PlayerList: Roact.FunctionComponent<PlayerListProps> = ({ players }) => {
 		>
 			{players.map((player, index) => (
 				<textlabel
-					Key={tostring(player.UserId)}
+					Key={player}
 					Size={new UDim2(1, 0, 0, 50)}
 					Position={new UDim2(0, 0, 0, index * 55)}
 					BackgroundColor3={new Color3(0.129, 0.129, 0.129)}
 					TextColor3={new Color3(1, 1, 1)}
-					Text={player.Name}
+					Text={player}
 					TextSize={18}
 					Font={Enum.Font.SourceSans}
 					TextXAlignment={Enum.TextXAlignment.Left}

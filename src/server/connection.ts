@@ -9,8 +9,7 @@ Players.PlayerAdded.Connect((player) => {
 	store.update("players", {
 		...store.getState().players,
 		[playerId]: {
-			currentLobby: null,
-			route: "menu",
+			currentLobby: undefined,
 		},
 	});
 });

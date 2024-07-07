@@ -1,31 +1,34 @@
-/* client/ui/router.tsx */
-
 import Roact from "@rbxts/roact";
-import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
-import { local_store } from "client/local_store";
-import Menu from "./menu";
-import FriendsList from "./friends_list";
-import ServerList from "./server_list";
-import Lobby from "./lobby";
+import { useState, useCallback, withHooks, useContext } from "@rbxts/roact-hooked";
 
-const routes: Record<string, Roact.FunctionComponent> = {
-	menu: Menu,
-	friends: FriendsList,
-	server: ServerList,
-	lobby: Lobby,
-};
+interface RouterContextValue {
+	currentRoute: string;
+	navigate: (route: string) => void;
+}
 
-const Router: Roact.FunctionComponent = () => {
-	const [state, setState] = useState(local_store.getState());
-	useEffect(() => {
-		const unsubscribe = local_store.changed.connect(() => {
-			setState(local_store.getState());
-		});
+const RouterContext = Roact.createContext<RouterContextValue>({
+	currentRoute: "menu",
+	navigate: () => {},
+});
 
-		return () => unsubscribe.disconnect();
+export const RouterProvider: Roact.FunctionComponent = withHooks((props) => {
+	const [currentRoute, setCurrentRoute] = useState<string>("menu");
+	const navigate = useCallback((route: string) => {
+		setCurrentRoute(route);
 	}, []);
-	const RouteComponent = routes[state.router.route] || Menu;
-	return <RouteComponent />;
-};
+	return <RouterContext.Provider value={{ currentRoute, navigate }}>{props[Roact.Children]}</RouterContext.Provider>;
+});
 
-export default withHooks(Router);
+export function useRouter(): RouterContextValue {
+	return useContext(RouterContext);
+}
+
+interface RouterProps {
+	routes: Record<string, Roact.FunctionComponent>;
+}
+
+export const Router: Roact.FunctionComponent<RouterProps> = withHooks((props) => {
+	const { currentRoute } = useRouter();
+	const RouteComponent = props.routes[currentRoute];
+	return RouteComponent ? <RouteComponent /> : <textlabel Text={`Route not found: ${currentRoute}`} />;
+});

@@ -5,9 +5,6 @@ const remoteEvent = ReplicatedStorage.WaitForChild("CatanRemoteEvent") as Remote
 
 const initSharedState: SharedState = {
 	lobbies: {},
-	router: {
-		route: "menu",
-	},
 };
 
 export const clientStore = new ClientStore<SharedState>(initSharedState, remoteEvent);
