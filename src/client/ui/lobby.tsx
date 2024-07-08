@@ -4,19 +4,32 @@ import { Players } from "@rbxts/services";
 import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
 import PlayerList from "./components/player_list";
 import { useRouter } from "./router";
-import Object from "@rbxts/object-utils";
 import { clientStore } from "client/store";
+import Object from "@rbxts/object-utils";
+import { serializeUserId } from "shared/utils";
+
+interface LobbyWithId extends Lobby {
+	id: string;
+}
 
 const Lobby: Roact.FunctionComponent = withHooks(() => {
-	const [lobby, setLobby] = useState<Lobby | undefined>(undefined);
-	const localPlayerId = tostring(Players.LocalPlayer.UserId);
+	const [lobby, setLobby] = useState<LobbyWithId | undefined>(undefined);
+	const localPlayerId = serializeUserId(Players.LocalPlayer);
 	const { navigate } = useRouter();
 
 	useEffect(() => {
-		const currentLobby = Object.values(clientStore.getState().lobbies).find((l) =>
-			l.players.includes(localPlayerId),
-		);
-		setLobby(currentLobby || undefined);
+		const lobbies = clientStore.getState().lobbies;
+		print(Object.keys(lobbies));
+		const [id, currentLobby] = Object.entries(lobbies).find(([, l]) => l.players.includes(localPlayerId)) || [
+			undefined,
+			undefined,
+		];
+
+		if (id && currentLobby) {
+			setLobby({ ...currentLobby, id });
+		} else {
+			setLobby(undefined);
+		}
 	}, [localPlayerId]);
 
 	if (!lobby) return <textlabel Text="Loading..." />;
@@ -55,6 +68,7 @@ const Lobby: Roact.FunctionComponent = withHooks(() => {
 			<frame Size={new UDim2(1, 0, 0.25, 0)} Position={new UDim2(0, 0, 0.75, 0)} BackgroundTransparency={1}>
 				{isOwner && (
 					<textbutton
+						Key="StartButton"
 						Size={new UDim2(0.5, 0, 1, 0)}
 						BackgroundColor3={Color3.fromRGB(45, 45, 45)}
 						TextColor3={Color3.fromRGB(255, 255, 255)}
@@ -67,6 +81,7 @@ const Lobby: Roact.FunctionComponent = withHooks(() => {
 					/>
 				)}
 				<textbutton
+					Key="LeaveButton"
 					Size={new UDim2(isOwner ? 0.5 : 1, 0, 1, 0)}
 					Position={isOwner ? new UDim2(0.5, 0, 0, 0) : new UDim2(0, 0, 0, 0)}
 					BackgroundColor3={Color3.fromRGB(45, 45, 45)}

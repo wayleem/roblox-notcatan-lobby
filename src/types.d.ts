@@ -1,7 +1,6 @@
 // types.d.ts
 
 interface Lobby {
-	id: string;
 	owner: string;
 	players: string[]; // Array of player IDs
 }

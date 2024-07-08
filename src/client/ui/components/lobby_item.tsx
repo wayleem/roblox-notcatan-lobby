@@ -1,13 +1,13 @@
 /* client/ui/components/lobby_item.tsx */
-
 import Roact from "@rbxts/roact";
 
-interface LobbyProps {
+interface LobbyItemProps {
+	id: string;
 	lobby: Lobby;
 	onClick: () => void;
 }
 
-const LobbyItem: Roact.FunctionComponent<LobbyProps> = ({ lobby, onClick }) => {
+const LobbyItem: Roact.FunctionComponent<LobbyItemProps> = ({ id, lobby, onClick }) => {
 	return (
 		<textbutton
 			Size={new UDim2(1, 0, 0, 50)} // Full width, height of 50 pixels
@@ -18,7 +18,7 @@ const LobbyItem: Roact.FunctionComponent<LobbyProps> = ({ lobby, onClick }) => {
 			}}
 		>
 			<textlabel
-				Text={`Id: ${lobby.id} | Lobby Owner: ${lobby.owner} | Players: ${lobby.players.size()}`}
+				Text={`Id: ${id} | Lobby Owner: ${lobby.owner} | Players: ${lobby.players.size()}`}
 				Size={new UDim2(1, -10, 1, -10)} // Slight padding
 				Position={new UDim2(0, 5, 0, 5)}
 				BackgroundTransparency={1} // Transparent background

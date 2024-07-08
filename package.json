@@ -30,6 +30,7 @@
 		"@rbxts/roact-router": "^1.1.6",
 		"@rbxts/rodux": "^3.0.0-ts.3",
 		"@rbxts/services": "^1.5.1",
+		"@reduxjs/toolkit": "^2.2.6",
 		"concurrently": "^8.2.2",
 		"roblox-ts": "^2.3.0"
 	}

@@ -15,14 +15,14 @@ const ServerList: Roact.FunctionComponent = withHooks(() => {
 		setLobbies(currentLobbies);
 	}, []);
 
-	const handleLobbyClick = (lobby: Lobby) => {
-		clientStore.sendToServer("JOIN_LOBBY", [lobby.id]);
+	const handleLobbyClick = (lobbyId: string) => {
+		clientStore.sendToServer("JOIN_LOBBY", lobbyId);
 		navigate("lobby"); // Navigate to the lobby page after joining
 	};
 
 	const lobbyItems = Object.entries(lobbies)
 		.filter(([, lobby]) => lobby && lobby.players.size() > 0)
-		.map(([id, lobby]) => <LobbyItem Key={id} lobby={lobby} onClick={() => handleLobbyClick(lobby)} />);
+		.map(([id, lobby]) => <LobbyItem Key={id} id={id} lobby={lobby} onClick={() => handleLobbyClick(id)} />);
 
 	return (
 		<frame

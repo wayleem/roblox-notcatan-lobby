@@ -1,7 +1,7 @@
 /* shared/utils.ts */
 
-export function serializeUserId(userId: number): string {
-	return `player:${userId}`;
+export function serializeUserId(player: Player): string {
+	return `player:${player.UserId}-${player.Name}`;
 }
 
 export function deserializeUserId(userId: string): number {

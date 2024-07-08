@@ -2,7 +2,6 @@
 import Roact from "@rbxts/roact";
 import { withHooks } from "@rbxts/roact-hooked";
 import { useRouter } from "../router";
-import { server } from "client/remote";
 import { clientStore } from "client/store";
 import { Players } from "@rbxts/services";
 import { serializeUserId } from "shared/utils";
@@ -19,8 +18,7 @@ const MenuButton: Roact.FunctionComponent<ButtonProps> = withHooks((props) => {
 
 	const handleClick = () => {
 		if (props.event) {
-			server.FireServer({ event: props.event });
-			clientStore.sendToServer(props.event, serializeUserId(Players.LocalPlayer.UserId));
+			clientStore.sendToServer(props.event, serializeUserId(Players.LocalPlayer));
 			print("fired: " + props.event);
 		}
 		navigate(props.to);

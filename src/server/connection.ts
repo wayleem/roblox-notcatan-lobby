@@ -5,7 +5,7 @@ import { serializeUserId } from "shared/utils";
 import { store } from "./store";
 
 Players.PlayerAdded.Connect((player) => {
-	const playerId = serializeUserId(player.UserId);
+	const playerId = serializeUserId(player);
 	store.update("players", {
 		...store.getState().players,
 		[playerId]: {
