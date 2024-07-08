@@ -7,30 +7,32 @@ import { useRouter } from "./router";
 import { clientStore } from "client/store";
 import Object from "@rbxts/object-utils";
 import { serializeUserId } from "shared/utils";
+import { useStore } from "shared/store";
 
 interface LobbyWithId extends Lobby {
 	id: string;
 }
 
 const Lobby: Roact.FunctionComponent = withHooks(() => {
-	const [lobby, setLobby] = useState<LobbyWithId | undefined>(undefined);
 	const localPlayerId = serializeUserId(Players.LocalPlayer);
 	const { navigate } = useRouter();
 
+	// Use the custom hook to subscribe to the lobbies state
+	const lobbies = useStore(clientStore, (state) => state.lobbies);
+
+	const [lobby, setLobby] = useState<LobbyWithId | undefined>(undefined);
+
 	useEffect(() => {
-		const lobbies = clientStore.getState().lobbies;
-		print(Object.keys(lobbies));
 		const [id, currentLobby] = Object.entries(lobbies).find(([, l]) => l.players.includes(localPlayerId)) || [
 			undefined,
 			undefined,
 		];
-
 		if (id && currentLobby) {
 			setLobby({ ...currentLobby, id });
 		} else {
 			setLobby(undefined);
 		}
-	}, [localPlayerId]);
+	}, [lobbies, localPlayerId]);
 
 	if (!lobby) return <textlabel Text="Loading..." />;
 

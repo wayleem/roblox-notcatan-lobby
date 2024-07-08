@@ -1,4 +1,5 @@
-import Object from "@rbxts/object-utils";
+import Object, { deepEquals } from "@rbxts/object-utils";
+import { useEffect, useState } from "@rbxts/roact-hooked";
 import { Store, Action, createReducer } from "@rbxts/rodux";
 
 // Define action types
@@ -99,6 +100,11 @@ class BaseStore<A extends SharedState, B, AB = A & B> {
 		}
 	}
 
+	public subscribe(listener: (state: AB) => void): () => void {
+		const connection = this.store.changed.connect(listener);
+		return () => connection.disconnect();
+	}
+
 	update<K extends keyof AB>(key: K, value: AB[K]) {
 		const action: UpdateAction<AB> = { type: "UPDATE", key, value };
 		this.store.dispatch(action);
@@ -182,4 +188,28 @@ export class ClientStore<A extends SharedState> extends BaseStore<A, {}> {
 	private requestState() {
 		this.sendToServer("NEW_CLIENT");
 	}
+}
+
+export function useStore<A extends SharedState, B, AB = A & B, T = AB>(
+	store: BaseStore<A, B, AB>,
+	selector: (state: AB) => T,
+): T {
+	const [selectedState, setSelectedState] = useState(() => selector(store.getState()));
+
+	useEffect(() => {
+		const unsubscribe = store.subscribe((newState) => {
+			const newSelectedState = selector(newState);
+			if (typeIs(newSelectedState, "table") && typeIs(selectedState, "table")) {
+				if (!deepEquals(newSelectedState, selectedState)) {
+					setSelectedState(newSelectedState);
+				}
+			} else if (newSelectedState !== selectedState) {
+				setSelectedState(newSelectedState);
+			}
+		});
+
+		return unsubscribe;
+	}, [store]);
+
+	return selectedState;
 }

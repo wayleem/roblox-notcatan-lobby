@@ -1,5 +1,7 @@
 /* shared/utils.ts */
 
+import Object from "@rbxts/object-utils";
+
 export function serializeUserId(player: Player): string {
 	return `player:${player.UserId}-${player.Name}`;
 }
