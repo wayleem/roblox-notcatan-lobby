@@ -1,24 +1,25 @@
-/* client/ui/server_list.tsx */
 import Roact from "@rbxts/roact";
-import { useEffect, useState, withHooks } from "@rbxts/roact-hooked";
+import { withHooks, useEffect, useState } from "@rbxts/roact-hooked";
 import LobbyItem from "./components/lobby_item";
 import { useRouter } from "./router";
 import { clientStore } from "client/store";
 import Object from "@rbxts/object-utils";
+import { useStore } from "shared/store";
 
 const ServerList: Roact.FunctionComponent = withHooks(() => {
-	const [lobbies, setLobbies] = useState<Record<string, Lobby>>(clientStore.getState().lobbies);
+	const lobbies = useStore(clientStore, (state) => state.lobbies);
+	const [, forceUpdate] = useState({});
 	const { navigate } = useRouter();
-
-	useEffect(() => {
-		const currentLobbies = clientStore.getState().lobbies;
-		setLobbies(currentLobbies);
-	}, []);
 
 	const handleLobbyClick = (lobbyId: string) => {
 		clientStore.sendToServer("JOIN_LOBBY", lobbyId);
-		navigate("lobby"); // Navigate to the lobby page after joining
+		navigate("lobby");
 	};
+
+	useEffect(() => {
+		print("ServerList: Lobbies updated", lobbies, "Lobby count:", Object.keys(lobbies).size());
+		forceUpdate({}); // Force a re-render whenever lobbies change
+	}, [lobbies]);
 
 	const lobbyItems = Object.entries(lobbies)
 		.filter(([, lobby]) => lobby && lobby.players.size() > 0)
@@ -41,6 +42,17 @@ const ServerList: Roact.FunctionComponent = withHooks(() => {
 				/>
 				{lobbyItems}
 			</scrollingframe>
+			{lobbyItems.size() === 0 && (
+				<textlabel
+					Text="No active lobbies"
+					Size={new UDim2(1, 0, 0, 30)}
+					Position={new UDim2(0, 0, 0.5, -15)}
+					BackgroundTransparency={1}
+					TextColor3={Color3.fromRGB(255, 255, 255)}
+					TextSize={18}
+					Font={Enum.Font.SourceSans}
+				/>
+			)}
 			<textbutton
 				Text="Back to Menu"
 				Size={new UDim2(0.8, 0, 0.08, 0)}

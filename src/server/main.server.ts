@@ -2,6 +2,6 @@
 
 import { makeHello } from "shared/module";
 import "./connection";
-import "./lobbyHandler";
+import "./lobby/lobbyHandler";
 
 print(makeHello("main.server.ts"));

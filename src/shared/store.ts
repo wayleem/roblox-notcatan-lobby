@@ -170,7 +170,9 @@ export class ClientStore<A extends SharedState> extends BaseStore<A, {}> {
 
 		this.registerHandler("STORE_ACTION", (_, payload) => {
 			if (typeIs(payload, "table") && "data" in payload) {
-				this.store.dispatch(payload.data as StoreAction<A>);
+				const action = payload.data as StoreAction<A>;
+				print("Received store action:", action); // Add this log
+				this.store.dispatch(action);
 			}
 		});
 
@@ -181,7 +183,8 @@ export class ClientStore<A extends SharedState> extends BaseStore<A, {}> {
 		});
 	}
 
-	sendToServer(event: string, data?: unknown) {
+	sendToServer<T>(event: string, data?: T) {
+		print(`Sending event to server: ${event}`, data);
 		this.remoteEvent.FireServer({ event, data });
 	}
 
@@ -199,13 +202,8 @@ export function useStore<A extends SharedState, B, AB = A & B, T = AB>(
 	useEffect(() => {
 		const unsubscribe = store.subscribe((newState) => {
 			const newSelectedState = selector(newState);
-			if (typeIs(newSelectedState, "table") && typeIs(selectedState, "table")) {
-				if (!deepEquals(newSelectedState, selectedState)) {
-					setSelectedState(newSelectedState);
-				}
-			} else if (newSelectedState !== selectedState) {
-				setSelectedState(newSelectedState);
-			}
+			print("useStore: State updated", newSelectedState);
+			setSelectedState(newSelectedState); // Always update, let React handle the diffing
 		});
 
 		return unsubscribe;

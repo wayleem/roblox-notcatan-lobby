@@ -1,7 +1,6 @@
-/* client/ui/lobby.tsx */
 import Roact from "@rbxts/roact";
 import { Players } from "@rbxts/services";
-import { useState, useEffect, withHooks } from "@rbxts/roact-hooked";
+import { withHooks } from "@rbxts/roact-hooked";
 import PlayerList from "./components/player_list";
 import { useRouter } from "./router";
 import { clientStore } from "client/store";
@@ -17,33 +16,25 @@ const Lobby: Roact.FunctionComponent = withHooks(() => {
 	const localPlayerId = serializeUserId(Players.LocalPlayer);
 	const { navigate } = useRouter();
 
-	// Use the custom hook to subscribe to the lobbies state
-	const lobbies = useStore(clientStore, (state) => state.lobbies);
-
-	const [lobby, setLobby] = useState<LobbyWithId | undefined>(undefined);
-
-	useEffect(() => {
-		const [id, currentLobby] = Object.entries(lobbies).find(([, l]) => l.players.includes(localPlayerId)) || [
+	const currentLobby = useStore(clientStore, (state) => {
+		const [id, lobby] = Object.entries(state.lobbies).find(([, l]) => l.players.includes(localPlayerId)) || [
 			undefined,
 			undefined,
 		];
-		if (id && currentLobby) {
-			setLobby({ ...currentLobby, id });
-		} else {
-			setLobby(undefined);
-		}
-	}, [lobbies, localPlayerId]);
+		return id && lobby ? ({ ...lobby, id } as LobbyWithId) : undefined;
+	});
 
-	if (!lobby) return <textlabel Text="Loading..." />;
+	if (!currentLobby) return <textlabel Text="Loading..." />;
 
-	const isOwner = lobby.owner === localPlayerId;
+	const isOwner = currentLobby.owner === localPlayerId;
 
 	const handleStartGame = () => {
-		clientStore.sendToServer("START_GAME", lobby.id);
+		clientStore.sendToServer("START_GAME", currentLobby.id);
 	};
 
 	const handleLeaveLobby = () => {
-		clientStore.sendToServer("LEAVE_LOBBY", lobby.id);
+		print(`Attempting to leave lobby ${currentLobby.id}`);
+		clientStore.sendToServer("LEAVE_LOBBY", currentLobby.id);
 		navigate("menu");
 	};
 
@@ -56,7 +47,7 @@ const Lobby: Roact.FunctionComponent = withHooks(() => {
 			BorderSizePixel={0}
 		>
 			<textlabel
-				Text={`Lobby ID: ${lobby.id}`}
+				Text={`Lobby ID: ${currentLobby.id}`}
 				Size={new UDim2(1, 0, 0, 30)}
 				Position={new UDim2(0, 0, 0, 0)}
 				BackgroundTransparency={1}
@@ -65,7 +56,7 @@ const Lobby: Roact.FunctionComponent = withHooks(() => {
 				Font={Enum.Font.SourceSans}
 			/>
 			<frame Size={new UDim2(1, 0, 0.6, 0)} Position={new UDim2(0, 0, 0.1, 0)} BackgroundTransparency={1}>
-				<PlayerList players={lobby.players} />
+				<PlayerList players={currentLobby.players} />
 			</frame>
 			<frame Size={new UDim2(1, 0, 0.25, 0)} Position={new UDim2(0, 0, 0.75, 0)} BackgroundTransparency={1}>
 				{isOwner && (
