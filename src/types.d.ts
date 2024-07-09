@@ -1,4 +1,10 @@
 // types.d.ts
+interface Payload<T = unknown> {
+	event: string;
+	data: T;
+}
+
+type HandlerFunction<AB> = (player: Player | undefined, payload: unknown) => void;
 
 interface Lobby {
 	owner: string;
@@ -7,11 +13,6 @@ interface Lobby {
 
 interface PlayerState {
 	currentLobby: string | undefined;
-}
-
-interface Payload<T = unknown> {
-	event: string;
-	data: T;
 }
 
 interface SharedState {
