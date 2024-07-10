@@ -29,12 +29,12 @@ const Lobby: Roact.FunctionComponent = withHooks(() => {
 	const isOwner = currentLobby.owner === localPlayerId;
 
 	const handleStartGame = () => {
-		clientStore.sendToServer("START_GAME", currentLobby.id);
+		clientStore.remote("START_GAME", currentLobby.id);
 	};
 
 	const handleLeaveLobby = () => {
 		print(`Attempting to leave lobby ${currentLobby.id}`);
-		clientStore.sendToServer("LEAVE_LOBBY", currentLobby.id);
+		clientStore.remote("LEAVE_LOBBY", currentLobby.id);
 		navigate("menu");
 	};
 

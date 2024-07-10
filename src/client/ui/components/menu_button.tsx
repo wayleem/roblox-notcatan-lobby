@@ -18,7 +18,7 @@ const MenuButton: Roact.FunctionComponent<ButtonProps> = withHooks((props) => {
 
 	const handleClick = () => {
 		if (props.event) {
-			clientStore.sendToServer(props.event, serializeUserId(Players.LocalPlayer));
+			clientStore.remote(props.event, serializeUserId(Players.LocalPlayer));
 			print("fired: " + props.event);
 		}
 		navigate(props.to);

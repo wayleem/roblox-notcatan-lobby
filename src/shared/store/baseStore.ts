@@ -1,11 +1,12 @@
 import { Store } from "@rbxts/rodux";
+import * as log from "../log";
 import createGenericReducer from "./reducer";
 import Object from "@rbxts/object-utils";
 
 export default class BaseStore<A extends SharedState, B, AB = A & B> {
 	protected store: Store<AB, StoreAction<AB>>;
 	protected remoteEvent: RemoteEvent;
-	private handlers = new Map<string, HandlerFunction<AB>>();
+	private remoteHandlers = new Map<string, HandlerFunction<AB>>();
 
 	constructor(initialSharedState: A, remoteEvent: RemoteEvent, serverState?: B) {
 		const initialState = serverState
@@ -30,32 +31,30 @@ export default class BaseStore<A extends SharedState, B, AB = A & B> {
 		if (game.GetService("RunService").IsServer()) {
 			this.remoteEvent.FireAllClients({ event: "STORE_ACTION", data: action });
 		} else {
-			warn("Attempted to broadcast from client-side store");
+			log.warn("Attempted to broadcast from client-side store");
 		}
 	}
 
 	private handleEvent(player: Player | undefined, data: unknown) {
 		if (typeIs(data, "table") && "event" in data && typeIs(data.event, "string")) {
-			const handler = this.handlers.get(data.event);
-			if (handler) {
-				try {
-					handler(player, data);
-				} catch (err) {
-					warn(`Error in handler for event "${data.event}": ${err}`);
-				}
-			} else {
-				warn(`No handler registered for event: ${data.event}`);
+			const handler = this.remoteHandlers.get(data.event);
+			if (!handler) return log.warn(`No handler registered for event: ${data.event}`);
+
+			try {
+				handler(player, data);
+			} catch (err) {
+				log.warn(`Error in handler for event "${data.event}": ${err}`);
 			}
 		} else {
-			warn("Invalid event data received");
+			log.warn("Invalid event data received");
 		}
 	}
 
 	public registerHandler(event: string, fn: HandlerFunction<AB>) {
-		if (this.handlers.has(event)) {
-			warn(`Handler for event "${event}" is being overwritten.`);
+		if (this.remoteHandlers.has(event)) {
+			log.warn(`Handler for event "${event}" is being overwritten.`);
 		}
-		this.handlers.set(event, fn);
+		this.remoteHandlers.set(event, fn);
 	}
 
 	public getState(): AB {

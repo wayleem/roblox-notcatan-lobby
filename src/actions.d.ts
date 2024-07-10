@@ -1,4 +1,4 @@
-import { Action } from "@reduxjs/toolkit";
+import { Action } from "@rbxts/rodux";
 
 // Define action types
 declare global {

@@ -12,7 +12,7 @@ const ServerList: Roact.FunctionComponent = withHooks(() => {
 	const { navigate } = useRouter();
 
 	const handleLobbyClick = (lobbyId: string) => {
-		clientStore.sendToServer("JOIN_LOBBY", lobbyId);
+		clientStore.remote("JOIN_LOBBY", lobbyId);
 		navigate("lobby");
 	};
 

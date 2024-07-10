@@ -23,7 +23,7 @@ store.registerHandler("CREATE_LOBBY", (player) => {
 	}
 });
 
-store.registerHandler("LEAVE_LOBBY", (player, payload: unknown) => {
+store.registerHandler("LEAVE_LOBBY", (player, payload) => {
 	if (!player) return;
 
 	const playerId = serializeUserId(player);
@@ -59,7 +59,7 @@ store.registerHandler("LEAVE_LOBBY", (player, payload: unknown) => {
 
 const MAX_PLAYERS_PER_LOBBY = 4; // Adjust this value as needed
 
-store.registerHandler("JOIN_LOBBY", (player, payload: unknown) => {
+store.registerHandler("JOIN_LOBBY", (player, payload) => {
 	if (!player) return;
 
 	const playerId = serializeUserId(player);
